@@ -24,18 +24,41 @@ h1 span{color:var(--accent);}
 .sync-pill.error{color:var(--red);border-color:rgba(242,99,99,.3);}
 
 /* sync modal */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:16px;}
 .modal-bg.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;width:90%;max-width:420px;}
-.modal h2{font-size:15px;font-weight:800;margin-bottom:8px;}
-.modal p{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
-.modal input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-family:'Space Mono',monospace;font-size:11px;outline:none;margin-bottom:8px;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0;width:100%;max-width:460px;overflow:hidden;}
+.modal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-head h2{font-size:14px;font-weight:800;letter-spacing:-.01em;}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0;transition:color .15s;}
+.modal-close:hover{color:var(--text);}
+.modal-body{padding:18px 20px;}
+.modal-step{margin-bottom:16px;}
+.modal-step-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.step-num{background:var(--border);color:var(--text);width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
+.modal input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-family:'Space Mono',monospace;font-size:11px;outline:none;transition:border-color .15s;}
 .modal input:focus{border-color:var(--accent);}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
-.mbtn{font-family:'Space Mono',monospace;font-size:10px;padding:6px 14px;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted);}
+.modal input::placeholder{color:var(--muted);}
+.modal-hint{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-top:5px;line-height:1.5;}
+.modal-hint a{color:var(--accent);text-decoration:none;}
+.modal-hint a:hover{text-decoration:underline;}
+.modal-sep{height:1px;background:var(--border);margin:16px 0;}
+.modal-gist-box{display:none;background:rgba(180,242,99,.05);border:1px solid rgba(180,242,99,.2);border-radius:7px;padding:12px 14px;margin-bottom:16px;}
+.modal-gist-box.show{display:block;}
+.modal-gist-box-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;}
+.modal-gist-id{font-family:'Space Mono',monospace;font-size:11px;color:var(--text);word-break:break-all;margin-bottom:8px;}
+.modal-gist-note{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);line-height:1.5;}
+.modal-copy-btn{font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;border-radius:4px;cursor:pointer;border:1px solid rgba(180,242,99,.3);background:rgba(180,242,99,.07);color:var(--accent);transition:all .13s;margin-top:6px;}
+.modal-copy-btn:hover{background:rgba(180,242,99,.16);}
+.modal-copy-btn.copied{color:var(--text);border-color:var(--border);}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;padding-top:4px;}
+.mbtn{font-family:'Space Mono',monospace;font-size:10px;padding:7px 16px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted);transition:all .13s;}
 .mbtn:hover{border-color:var(--accent);color:var(--text);}
 .mbtn.primary{background:var(--accent);color:#0d0f0e;border-color:var(--accent);font-weight:700;}
 .mbtn.primary:hover{background:#c8ff70;}
+.mbtn.danger{border-color:rgba(242,99,99,.3);color:var(--red);}
+.mbtn.danger:hover{border-color:var(--red);background:rgba(242,99,99,.08);}
+.modal-err{font-family:'Space Mono',monospace;font-size:10px;color:var(--red);margin-top:8px;display:none;}
+.modal-err.show{display:block;}
 
 .stage-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:7px;padding:10px 28px;border-bottom:1px solid var(--border);background:var(--surface);}
 .spill{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 11px;cursor:pointer;transition:border-color .15s;}
@@ -105,15 +128,44 @@ td{padding:8px 8px;vertical-align:middle;}td.ck{padding-left:0;width:30px;}
 <body>
 
 <!-- SYNC MODAL -->
-<div class="modal-bg" id="modal">
+<div class="modal-bg" id="modal" onclick="modalBgClick(event)">
   <div class="modal">
-    <h2>☁️ Cross-Device Sync</h2>
-    <p>Uses a private GitHub Gist to sync your checkboxes across all devices. Create a token at github.com → Settings → Developer Settings → Personal Access Tokens → Tokens (classic) with <strong>gist</strong> scope only.</p>
-    <input id="token-input" type="password" placeholder="GitHub token (ghp_...)"/>
-    <input id="gist-input" type="text" placeholder="Gist ID (leave blank to create new)"/>
-    <div class="modal-btns">
-      <button class="mbtn" onclick="closeModal()">Cancel</button>
-      <button class="mbtn primary" onclick="connectSync()">Connect</button>
+    <div class="modal-head">
+      <h2>☁ Cross-Device Sync</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Connected: show gist ID for other devices -->
+      <div class="modal-gist-box" id="gist-connected-box">
+        <div class="modal-gist-box-label">Connected — Gist ID</div>
+        <div class="modal-gist-id" id="gist-id-display"></div>
+        <div class="modal-gist-note">To sync another device, enter this same Gist ID along with your token.</div>
+        <button class="modal-copy-btn" id="copy-gist-btn" onclick="copyGistId()">Copy ID</button>
+      </div>
+
+      <div class="modal-step">
+        <div class="modal-step-label"><span class="step-num">1</span> GitHub Personal Access Token</div>
+        <input id="token-input" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/>
+        <div class="modal-hint">
+          Create one at <a href="https://github.com/settings/tokens/new?scopes=gist&description=uMill+BOM+Sync" target="_blank">github.com → Settings → Tokens (classic)</a> — enable <strong>gist</strong> scope only. Token never leaves your browser.
+        </div>
+      </div>
+
+      <div class="modal-step">
+        <div class="modal-step-label"><span class="step-num">2</span> Gist ID (optional)</div>
+        <input id="gist-input" type="text" placeholder="Leave blank to create a new private Gist"/>
+        <div class="modal-hint">First time? Leave blank. Second device? Paste the Gist ID shown after first connection.</div>
+      </div>
+
+      <div class="modal-err" id="modal-err"></div>
+
+      <div class="modal-sep"></div>
+      <div class="modal-btns">
+        <button class="mbtn danger" id="disconnect-btn" onclick="disconnectSync()" style="margin-right:auto;display:none">Disconnect</button>
+        <button class="mbtn" onclick="closeModal()">Cancel</button>
+        <button class="mbtn primary" onclick="connectSync()">Connect &amp; Sync</button>
+      </div>
     </div>
   </div>
 </div>
@@ -247,69 +299,81 @@ td{padding:8px 8px;vertical-align:middle;}td.ck{padding-left:0;width:30px;}
 </div>
 
 <script>
-const SK = 'umill-bom-v1';
-const GIST_SK = 'umill-gist';
+const SK       = 'umill-bom-v1';
+const GIST_SK  = 'umill-gist';
 const TOKEN_SK = 'umill-token';
 const GT = 546;
 let ck = {}, syncToken = '', gistId = '';
+let saveTimer = null;
 
-// ── Storage ──
+// ── Local storage ──
 function lsLoad() { try { return JSON.parse(localStorage.getItem(SK)) || {}; } catch { return {}; } }
 function lsSave(d) { try { localStorage.setItem(SK, JSON.stringify(d)); } catch {} }
 
-// ── Gist sync ──
-async function gistLoad() {
-  if (!gistId || !syncToken) return null;
-  try {
-    const r = await fetch(`https://api.github.com/gists/${gistId}`, {headers:{'Authorization':`token ${syncToken}`}});
-    if (!r.ok) return null;
-    const data = await r.json();
-    return JSON.parse(data.files['umill-bom.json']?.content || '{}');
-  } catch { return null; }
-}
-
-async function gistSave(d) {
-  if (!gistId || !syncToken) return;
-  setPill('saving','☁ Saving…');
-  try {
-    const url = gistId === 'new'
-      ? 'https://api.github.com/gists'
-      : `https://api.github.com/gists/${gistId}`;
-    const method = gistId === 'new' ? 'POST' : 'PATCH';
-    const body = {
-      description: 'µMill BOM progress',
-      public: false,
-      files: { 'umill-bom.json': { content: JSON.stringify(d) } }
-    };
-    const r = await fetch(url, {method, headers:{'Authorization':`token ${syncToken}`,'Content-Type':'application/json'}, body: JSON.stringify(body)});
-    if (!r.ok) { setPill('error','☁ Error'); return; }
-    const resp = await r.json();
-    if (gistId === 'new') {
-      gistId = resp.id;
-      localStorage.setItem(GIST_SK, gistId);
-    }
-    setPill('synced','☁ Synced');
-  } catch { setPill('error','☁ Offline'); }
-}
-
+// ── Pill ──
 function setPill(cls, txt) {
   const p = document.getElementById('sync-pill');
   p.className = 'sync-pill ' + cls;
   p.textContent = txt;
 }
 
+// ── Gist API ──
+async function gistLoad() {
+  if (!gistId || !syncToken) return null;
+  try {
+    const r = await fetch(`https://api.github.com/gists/${gistId}`,
+      {headers:{'Authorization':'Bearer '+syncToken,'X-GitHub-Api-Version':'2022-11-28'}});
+    if (!r.ok) { if (r.status===401||r.status===404) setPill('error','☁ Auth error'); return null; }
+    const data = await r.json();
+    const raw = data.files?.['umill-bom.json']?.content;
+    return raw ? JSON.parse(raw) : {};
+  } catch { setPill('error','☁ Offline'); return null; }
+}
+
+async function gistSave(d) {
+  if (!syncToken) return;
+  setPill('saving','☁ Saving…');
+  try {
+    const isNew = !gistId || gistId === 'new';
+    const url    = isNew ? 'https://api.github.com/gists' : `https://api.github.com/gists/${gistId}`;
+    const method = isNew ? 'POST' : 'PATCH';
+    const body   = { description:'µMill BOM progress', public:false,
+                     files:{'umill-bom.json':{content:JSON.stringify(d)}} };
+    const r = await fetch(url, {method,
+      headers:{'Authorization':'Bearer '+syncToken,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'},
+      body:JSON.stringify(body)});
+    if (!r.ok) { setPill('error','☁ Save error'); return; }
+    const resp = await r.json();
+    if (isNew) {
+      gistId = resp.id;
+      localStorage.setItem(GIST_SK, gistId);
+      updateConnectedBox();
+    }
+    setPill('synced','☁ Synced');
+  } catch { setPill('error','☁ Offline'); }
+}
+
+// Debounce saves so rapid checkbox clicks don't hammer the API
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => gistSave(ck), 1200);
+}
+
 // ── Init ──
 ck = lsLoad();
 syncToken = localStorage.getItem(TOKEN_SK) || '';
-gistId = localStorage.getItem(GIST_SK) || '';
+gistId    = localStorage.getItem(GIST_SK)  || '';
+
 if (syncToken && gistId) {
   setPill('saving','☁ Loading…');
   gistLoad().then(remote => {
-    if (remote) { ck = remote; lsSave(ck); applyChecks(); upd(); }
+    if (remote && Object.keys(remote).length) { ck = remote; lsSave(ck); applyChecks(); upd(); }
     setPill('synced','☁ Synced');
   });
 } else if (syncToken || gistId) {
-  setPill('','☁ Setup needed');
+  setPill('','☁ Setup incomplete');
+} else {
+  setPill('','☁ Sync');
 }
 
 function applyChecks() {
@@ -325,12 +389,12 @@ upd();
 // ── Toggle ──
 function tog(el) {
   const row = el.closest('.bom-row');
-  const id = row.dataset.id;
-  const on = el.classList.toggle('on');
+  const id  = row.dataset.id;
+  const on  = el.classList.toggle('on');
   row.classList.toggle('done', on);
   ck[id] = on;
   lsSave(ck);
-  gistSave(ck);
+  if (syncToken) scheduleSave();
   upd();
 }
 
@@ -367,39 +431,91 @@ function apply(q='') {
     else if (stgF!=='all' && r.dataset.stage!==stgF) show=false;
     r.classList.toggle('row-hidden',!show);
   });
-  document.querySelectorAll('.section').forEach(s => { s.style.display = s.querySelectorAll('.bom-row:not(.row-hidden)').length ? '' : 'none'; });
+  document.querySelectorAll('.section').forEach(s => {
+    s.style.display = s.querySelectorAll('.bom-row:not(.row-hidden)').length ? '' : 'none';
+  });
 }
 
 function resetAll() {
   if (!confirm('Reset all checkboxes?')) return;
-  ck={}; lsSave(ck); gistSave(ck);
+  ck = {}; lsSave(ck);
+  if (syncToken) gistSave(ck);
   document.querySelectorAll('.cb').forEach(e=>e.classList.remove('on'));
   document.querySelectorAll('.bom-row').forEach(r=>r.classList.remove('done'));
   upd();
 }
 
 // ── Sync modal ──
+function updateConnectedBox() {
+  const box = document.getElementById('gist-connected-box');
+  const disp = document.getElementById('gist-id-display');
+  const discBtn = document.getElementById('disconnect-btn');
+  if (gistId && gistId !== 'new' && syncToken) {
+    box.classList.add('show');
+    disp.textContent = gistId;
+    discBtn.style.display = '';
+  } else {
+    box.classList.remove('show');
+    discBtn.style.display = 'none';
+  }
+}
+
 function openModal() {
   document.getElementById('token-input').value = syncToken;
-  document.getElementById('gist-input').value = gistId;
+  document.getElementById('gist-input').value  = (gistId && gistId !== 'new') ? gistId : '';
+  document.getElementById('modal-err').classList.remove('show');
+  updateConnectedBox();
   document.getElementById('modal').classList.add('open');
 }
+
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function modalBgClick(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
 async function connectSync() {
-  syncToken = document.getElementById('token-input').value.trim();
-  const inputGist = document.getElementById('gist-input').value.trim();
-  gistId = inputGist || 'new';
+  const token    = document.getElementById('token-input').value.trim();
+  const inputId  = document.getElementById('gist-input').value.trim();
+  const errEl    = document.getElementById('modal-err');
+  errEl.classList.remove('show');
+
+  if (!token) { errEl.textContent = 'Token is required.'; errEl.classList.add('show'); return; }
+
+  syncToken = token;
+  gistId    = inputId || 'new';
   localStorage.setItem(TOKEN_SK, syncToken);
+
   closeModal();
   setPill('saving','☁ Connecting…');
+
   if (gistId === 'new') {
+    // First time: push local state to a new gist
     await gistSave(ck);
   } else {
+    // Existing gist: pull remote state
     const remote = await gistLoad();
     if (remote) { ck = remote; lsSave(ck); applyChecks(); upd(); }
     setPill('synced','☁ Synced');
   }
   localStorage.setItem(GIST_SK, gistId);
+  updateConnectedBox();
+}
+
+function disconnectSync() {
+  if (!confirm('Disconnect sync? Your local checkboxes will be kept.')) return;
+  syncToken = ''; gistId = '';
+  localStorage.removeItem(TOKEN_SK);
+  localStorage.removeItem(GIST_SK);
+  closeModal();
+  setPill('','☁ Sync');
+}
+
+function copyGistId() {
+  navigator.clipboard.writeText(gistId).then(() => {
+    const btn = document.getElementById('copy-gist-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy ID'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 </script>
 </body>
